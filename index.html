@@ -1,0 +1,173 @@
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>Tetris by oivoodoo</title>
+    <script type="text/javascript" language="javascript" charset="utf-8" src='scripts/raphael.js'></script>
+  </head>
+
+  <body>
+    <div id='container'>
+
+    </div>
+
+    <script type="text/javascript" language="javascript" charset="utf-8">
+    // <![CDATA[
+
+        var Application = function() {
+          var instance = this;
+          this.block_size = 40;
+          this.container_size = 402;
+          this.blocks = [];
+          this.positions = [];
+          this.ids = [];
+          this.paper = null;
+          this.start_drug = false;
+          this.current_block = 0;
+          this.clear_block = 15;
+          this.swap_speed = 2000;
+
+          this.initialize = function() {
+            this.paper = new Raphael("container", this.container_size, this.container_size);
+            var iterator = 1;
+
+            for(var i = 0; i < 4; i++) {
+              for(var j = 0; j < 4; j++) {
+                var set = this.create_block(i, j, iterator);
+                this.blocks.push(set);
+                this.positions.push(iterator);
+                iterator += 1;
+              }
+            }
+          };
+
+          this.find_block = function(control) {
+            for(var i = 0; i < this.blocks.length; i++) {
+              if (control.type == "rect" && this.blocks[i][0].id == control.id) {
+                return i;
+              // Try to check another boxes types
+              } else if (this.blocks[i].length > 1 && this.blocks[i][1].id == control.id) {
+                return i;
+              }
+            }
+            return -1;
+          };
+
+          this.is_complete = function() {
+            return false;
+          };
+
+          this.show_scores = function() {
+            // TODO: Show score dialog with time.
+          };
+
+          this.restart_game = function() {
+            // TODO: Restart game timer.
+            this.initialize();
+          };
+
+          this.near_clear_block = function(i) {
+            if (this.clear_block == i + 1 ||
+                this.clear_block == i - 1 ||
+                this.clear_block == i + 4 ||
+                this.clear_block == i - 4) {
+              return true;
+            }
+            return false;
+          };
+
+          this.get_positions = function(i) {
+            if (this.clear_block == i + 1) {
+              return {f: [this.block_size, 0], s: [-this.block_size, 0]};
+            } else if (this.clear_block == i - 1) {
+              return {f: [-this.block_size, 0], s: [this.block_size, 0]};
+            } else if (this.clear_block == i + 4) {
+              return {f: [0, this.block_size], s: [0, -this.block_size]};
+            } else if (this.clear_block == i - 4) {
+              return {f: [0, -this.block_size], s: [0, this.block_size]};
+            }
+          }
+
+          this.swap_blocks = function(i, j) {
+          debugger;
+            var p = this.get_positions(i);
+            var b1 = this.blocks[i].getBBox();
+            var b2 = this.blocks[j].getBBox();
+            this.blocks[i][0].animate({
+                                    x: b1.x + p['f'][0],
+                                    y: b1.y + p['f'][1]
+                                   }, this.swap_speed, ">");
+            this.blocks[i][1].animate({
+                                    x: b1.x + p['f'][0] + b1.width / 2,
+                                    y: b1.y + p['f'][1] + b1.height / 2
+                                   }, this.swap_speed, ">");
+            this.blocks[j][0].animate({
+                                    x: b2.x + p['s'][0],
+                                    y: b2.y + p['s'][1]
+                                   }, this.swap_speed, "<>");
+            this.blocks[j][1].animate({
+                                    x: b2.x + p['s'][0] + b1.width / 2,
+                                    y: b2.y + p['s'][1] + b1.height / 2
+                                   }, this.swap_speed, "<>");
+
+            var block = this.blocks[i];
+            this.blocks[i] = this.blocks[j];
+            this.blocks[j] = block;
+          };
+
+          this.create_block = function(i, j, iterator) {
+            var set = this.paper.set();
+            if (iterator != 16) {
+              set.push(
+                this.paper.rect(this.block_size * j,
+                                this.block_size * i,
+                                this.block_size,
+                                this.block_size, 10)
+                          .attr({fill: '#9cf', stroke: '#ddd', 'stroke-width': 5}),
+                this.paper.text(this.block_size * (j + 1) - this.block_size / 2,
+                                this.block_size * (i + 1) - this.block_size / 2,
+                                iterator)
+                          .attr({"font-family": "Tahoma", "font-size": 18})
+              );
+            } else {
+              set.push(
+                this.paper.rect(this.block_size * j,
+                                this.block_size * i,
+                                this.block_size,
+                                this.block_size, 10)
+                          .attr({fill: '#9cf', stroke: '#ddd', 'stroke-width': 5})
+              );
+            };
+
+            set.click(function() {
+              var block = instance.find_block(this);
+              if (block != -1 && instance.near_clear_block(block)) {
+                instance.swap_blocks(block, instance.clear_block);
+                instance.clear_block = block;
+              }
+              if (instance.is_complete()) {
+                instance.restart_game();
+              }
+            });
+
+            set.hover(function() {
+              set[1].attr({fill: "red"});
+            }, function() {
+              set[1].attr({fill: "black"});
+            });
+
+            return set;
+          }
+
+          this.initialize();
+
+        }
+
+        var application = new Application;
+
+    // ]]>
+    </script>
+
+  </body>
+
+</html>
+
