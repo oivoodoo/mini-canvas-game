@@ -1,8 +1,9 @@
 <html>
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-    <title>Tetris by oivoodoo</title>
+    <title>Mini Canvas Game by oivoodoo</title>
     <script type="text/javascript" language="javascript" charset="utf-8" src='scripts/raphael.js'></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src='scripts/game.js' /></script>
   </head>
 
   <body>
@@ -30,24 +31,23 @@
             this.paper = new Raphael("container", this.container_size, this.container_size);
             this.randomize_blocks();
           };
-          
+
           this.randomize_blocks = function() {
             var iterator = 1;
-            debugger;
             for(var i = 0; i < 4; i++) {
               for(var j = 0; j < 4; j++) {
                 var position = -1;
-                for(;this.is_exists_block(position);) {
-                  position = Math.floor(Math.random() * 16);
+                for(;position == -1 || this.is_exists_block(position);) {
+                  position = Math.floor(Math.random() * 16) + 1;
                 }
-                var set = this.create_block(i, j, position);
+                var set = this.create_block(i, j, position, this.blocks.length);
                 this.blocks.push(set);
                 this.numbers.push(position);
                 iterator += 1;
               }
             }
           };
-          
+
           this.is_exists_block = function(number) {
             for(var i = 0; i < this.numbers.length; i++) {
               if (this.numbers[i] == number) {
@@ -71,6 +71,11 @@
           };
 
           this.is_complete = function() {
+            for (var i = 0; i < this.numbers.length; i++) {
+              if(this.numbers[i] == i + 1) {
+                return true;
+              }
+            }
             return false;
           };
 
@@ -103,25 +108,26 @@
             } else if (this.clear_block == i - 4) {
               return {f: [0, -this.block_size], s: [0, this.block_size]};
             }
+            return {f:[0,0], s:[0,0]};
           }
 
           this.swap_blocks = function(i, j) {
             var p = this.get_positions(i);
             var b1 = this.blocks[i];
             var b2 = this.blocks[j];
-			
+
             this.move_block(b1, p['f'][0], p['f'][1]);
             this.move_block(b2, p['s'][0], p['s'][1]);
-            
+
             var block = this.blocks[i];
             this.blocks[i] = this.blocks[j];
             this.blocks[j] = block;
-            
+
             var n = this.numbers[i];
             this.numbers[i] = this.numbers[j];
             this.numbers[j] = n;
           };
-		  
+
           this.move_block = function(bl, x, y) {
             for(var i = 0; i < bl.length; i++) {
               bl[i].animate({
@@ -131,7 +137,7 @@
             }
           };
 
-          this.create_block = function(i, j, iterator) {
+          this.create_block = function(i, j, iterator, len) {
             var set = this.paper.set();
             if (iterator != 16) {
               set.push(
@@ -153,6 +159,7 @@
                                 this.block_size, 10)
                           .attr({fill: '#9cf', stroke: '#ddd', 'stroke-width': 5})
               );
+              this.clear_block = len;
             };
 
             set.click(function() {
