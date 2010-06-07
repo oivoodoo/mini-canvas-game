@@ -18,7 +18,7 @@
           this.block_size = 40;
           this.container_size = 402;
           this.blocks = [];
-          this.positions = [];
+          this.numbers = [];
           this.ids = [];
           this.paper = null;
           this.start_drug = false;
@@ -28,18 +28,37 @@
 
           this.initialize = function() {
             this.paper = new Raphael("container", this.container_size, this.container_size);
+            this.randomize_blocks();
+          };
+          
+          this.randomize_blocks = function() {
             var iterator = 1;
-
+            debugger;
             for(var i = 0; i < 4; i++) {
               for(var j = 0; j < 4; j++) {
-                var set = this.create_block(i, j, iterator);
+                var position = -1;
+                for(;this.is_exists_block(position);) {
+                  position = Math.floor(Math.random() * 16);
+                }
+                var set = this.create_block(i, j, position);
                 this.blocks.push(set);
+                this.numbers.push(position);
                 iterator += 1;
               }
             }
           };
+          
+          this.is_exists_block = function(number) {
+            for(var i = 0; i < this.numbers.length; i++) {
+              if (this.numbers[i] == number) {
+                return true;
+              }
+            }
+            return false;
+          };
 
           this.find_block = function(control) {
+            // TODO: rewrite method for placing behind the blocks rectangle with opacity.
             for(var i = 0; i < this.blocks.length; i++) {
               if (control.type == "rect" && this.blocks[i][0].id == control.id) {
                 return i;
@@ -87,7 +106,6 @@
           }
 
           this.swap_blocks = function(i, j) {
-
             var p = this.get_positions(i);
             var b1 = this.blocks[i];
             var b2 = this.blocks[j];
@@ -98,6 +116,10 @@
             var block = this.blocks[i];
             this.blocks[i] = this.blocks[j];
             this.blocks[j] = block;
+            
+            var n = this.numbers[i];
+            this.numbers[i] = this.numbers[j];
+            this.numbers[j] = n;
           };
 		  
           this.move_block = function(bl, x, y) {
