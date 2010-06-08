@@ -33,7 +33,6 @@
           };
 
           this.randomize_blocks = function() {
-            var iterator = 1;
             for(var i = 0; i < 4; i++) {
               for(var j = 0; j < 4; j++) {
                 var position = -1;
@@ -43,7 +42,6 @@
                 var set = this.create_block(i, j, position, this.blocks.length);
                 this.blocks.push(set);
                 this.numbers.push(position);
-                iterator += 1;
               }
             }
           };
@@ -71,21 +69,25 @@
           };
 
           this.is_complete = function() {
+            var iterator = 0;
             for (var i = 0; i < this.numbers.length; i++) {
               if(this.numbers[i] == i + 1) {
-                return true;
+                iterator++;
               }
+            }
+            if (iterator == i) {
+              return true;
             }
             return false;
           };
 
           this.show_scores = function() {
-            // TODO: Show score dialog with time.
+            alert('You completed!');
           };
 
           this.restart_game = function() {
-            // TODO: Restart game timer.
-            this.initialize();
+            this.paper.clear();
+            this.randomize_blocks();
           };
 
           this.near_clear_block = function(i) {
