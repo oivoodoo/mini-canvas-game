@@ -17,7 +17,8 @@
         var Application = function() {
           var instance = this;
           this.block_size = 40;
-          this.container_size = 402;
+          this.container_size = 162;
+          this.score_size = 100;
           this.blocks = [];
           this.numbers = [];
           this.ids = [];
@@ -25,10 +26,21 @@
           this.start_drug = false;
           this.current_block = 0;
           this.clear_block = 15;
-          this.swap_speed = 1000;
+          this.swap_speed = 300;
+          this.work_animation = 0;
+          this.clicks = 0;
+          
+          // Controls 
+          this.score_text = null;
 
           this.initialize = function() {
-            this.paper = new Raphael("container", this.container_size, this.container_size);
+            this.paper = new Raphael("container", this.container_size + this.score_size, this.container_size);
+            var t = this.paper.text(this.container_size + this.score_size / 3 + 15, 10, "Clicks:");
+            this.score_text = this.paper.text(this.container_size + this.score_size / 3 + 15, 30, this.clicks.toString());
+            var s = this.paper.set();
+            s.push(t);
+            s.push(this.score_text);
+            s.attr({"font-size": 20, "font-family": "Myrand"});
             this.randomize_blocks();
           };
 
@@ -86,9 +98,17 @@
           };
 
           this.restart_game = function() {
-            this.paper.clear();
+            for(var i = 0; i < this.blocks.length; i++) {
+              this.blocks[i].animate({opacity: 0}, 2000, "<>").remove();
+            }
             this.randomize_blocks();
+            this.clicks = 0;
           };
+          
+          this.update_score = function() {
+            this.clicks += 1;
+            this.score_text.attr({text: this.clicks});
+          }
 
           this.near_clear_block = function(i) {
             if (this.clear_block == i + 1 ||
@@ -117,7 +137,8 @@
             var p = this.get_positions(i);
             var b1 = this.blocks[i];
             var b2 = this.blocks[j];
-
+            
+            this.work_animation = b1.length + b2.length;
             this.move_block(b1, p['f'][0], p['f'][1]);
             this.move_block(b2, p['s'][0], p['s'][1]);
 
@@ -131,11 +152,14 @@
           };
 
           this.move_block = function(bl, x, y) {
+            var instance = this;
             for(var i = 0; i < bl.length; i++) {
               bl[i].animate({
                 x: x + bl[i].attrs.x,
                 y: y + bl[i].attrs.y
-              }, this.swap_speed, ">");
+              }, this.swap_speed, ">", function() {
+                instance.work_animation -= 1;
+              });
             }
           };
 
@@ -151,7 +175,7 @@
                 this.paper.text(this.block_size * (j + 1) - this.block_size / 2,
                                 this.block_size * (i + 1) - this.block_size / 2,
                                 iterator)
-                          .attr({"font-family": "Tahoma", "font-size": 18})
+                          .attr({"font-family": "Myrand", "font-size": 18})
               );
             } else {
               set.push(
@@ -165,20 +189,27 @@
             };
 
             set.click(function() {
-              var block = instance.find_block(this);
-              if (block != -1 && instance.near_clear_block(block)) {
-                instance.swap_blocks(block, instance.clear_block);
-                instance.clear_block = block;
-              }
-              if (instance.is_complete()) {
-                instance.restart_game();
+              instance.update_score();
+              if (instance.work_animation == 0) {
+                var block = instance.find_block(this);
+                if (block != -1 && instance.near_clear_block(block)) {
+                  instance.swap_blocks(block, instance.clear_block);
+                  instance.clear_block = block;
+                }
+                if (instance.is_complete()) {
+                  instance.restart_game();
+                }
               }
             });
 
             set.hover(function() {
-              set[1].attr({fill: "red"});
+              if (set.length > 1) {
+                set[1].attr({fill: "red"});
+              }
             }, function() {
-              set[1].attr({fill: "black"});
+              if (set.length > 1) {
+                set[1].attr({fill: "black"});
+              }
             });
 
             return set;
