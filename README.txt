@@ -1,4 +1,4 @@
-This is just example of mini canvas game, written 100% in javascript.
+This is just example of mini game, written 100% in javascript using raphaeljs library.
 
 Example of application you can see at http://apps.facebook.com/iloveannakorsak/game.html
 
