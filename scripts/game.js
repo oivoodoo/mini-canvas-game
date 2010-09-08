@@ -24,7 +24,7 @@ var Application = function(panel_id) {
   this.initialize = function() {
     this.paper = new Raphael(this.panel_id, this.container_size + this.score_size, this.container_size);
     var t = this.paper.text(10, this.container_size + this.score_size / 3 + 15, "Clicks:");
-    this.score_text = this.paper.text(this.container_size + this.score_size / 3 + 15, 30, this.clicks.toString());
+    this.score_text = this.paper.text(30, this.container_size + this.score_size / 3 + 15, this.clicks.toString());
     var s = this.paper.set();
     s.push(t).push(this.score_text).attr({"font-size": 20, "font-family": "Myrand"});
     this.randomize_blocks();
