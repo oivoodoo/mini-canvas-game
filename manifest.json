@@ -1,0 +1,12 @@
+{
+   "browser_action": {
+      "default_icon": "icon.png",
+      "popup": "game.html"
+   },
+   "description": "Tired? Then it's time to move!",
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7hjyzWBtuya2aqDCskhiECfaxCu1HaiXtzECSy468gHqmYuCuib3Px+9oUGjrOJxW44RKMYGWWB9WyV6PbQM2EY5spa3gZ086VZouTPtQTPLD1pJt2AzAZ8iogvT7di8v0U9wLtQ9VozJrJyMJuN9gjfMamRGHBcVshn5HSeD4wIDAQAB",
+   "name": "15 Fun Game",
+   "permissions": [ "tabs" ],
+   "update_url": "http://clients2.google.com/service/update2/crx",
+   "version": "1.8"
+}
